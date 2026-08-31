@@ -1,0 +1,24 @@
+.button {
+  min-height: 56px;
+  border: 0;
+  border-radius: 18px;
+  padding: 14px 22px;
+  font: inherit;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  background: var(--surface-strong);
+  color: var(--text);
+  box-shadow: var(--shadow-soft);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.button:active {
+  transform: translateY(2px) scale(0.99);
+  box-shadow: none;
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

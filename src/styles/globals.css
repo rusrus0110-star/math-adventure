@@ -1,0 +1,22 @@
+:root {
+  font-family: Inter, ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  color: #2e2a3b;
+  background: #fff8ef;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --background: #fff8ef;
+  --surface: #ffffff;
+  --surface-strong: #f4e7ff;
+  --accent: #ffb54a;
+  --border: #eadfda;
+  --text: #2e2a3b;
+  --text-muted: #766f7d;
+  --shadow-soft: 0 10px 28px rgb(84 66 96 / 0.12);
+}
+
+* { box-sizing: border-box; }
+html { background: var(--background); }
+body { margin: 0; min-width: 320px; min-height: 100dvh; background: radial-gradient(circle at top, #fff 0, var(--background) 58%); }
+button, input { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible { outline: 3px solid #6b5cff; outline-offset: 3px; }
+h1, h2, p { margin-top: 0; }

@@ -1,0 +1,263 @@
+.page {
+  width: min(calc(100vw - 36px), 1000px);
+  height: calc(
+    100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+  );
+  min-height: 0;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.resultLayout {
+  width: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(190px, 0.72fr) minmax(380px, 1.28fr);
+  align-items: center;
+  gap: clamp(24px, 5vw, 68px);
+}
+
+.characterPanel {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.characterPanel > div {
+  width: clamp(190px, 34vh, 300px);
+  max-width: 100%;
+}
+
+.content {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: clamp(10px, 1.6vh, 16px);
+}
+
+.heading {
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  text-align: center;
+}
+
+.heading h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4.5vh, 2.55rem);
+  line-height: 1.05;
+}
+
+.stars {
+  min-height: 38px;
+  font-size: clamp(1.7rem, 4.2vh, 2.25rem);
+  line-height: 1;
+  letter-spacing: 5px;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(8px, 1.2vh, 11px);
+}
+
+.summaryItem {
+  min-width: 0;
+  min-height: 62px;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 6px 18px rgb(84 66 96 / 0.07);
+  text-align: center;
+}
+
+.summaryItem span {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summaryItem strong {
+  font-size: clamp(1.05rem, 2.5vh, 1.28rem);
+  line-height: 1.1;
+}
+
+.coinsItem {
+  grid-column: 1 / -1;
+  min-height: 56px;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  text-align: left;
+}
+
+.coinsItem strong {
+  text-align: right;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 10px;
+}
+
+.actions > button {
+  min-width: 0;
+  min-height: 50px;
+  padding: 10px 14px;
+}
+
+.homeLink {
+  grid-column: 1 / -1;
+  min-height: 42px !important;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.homeLink:hover {
+  background: rgb(255 255 255 / 0.62);
+  color: var(--text);
+}
+
+/* Phone / portrait tablet */
+@media (max-width: 700px) {
+  .page {
+    width: 100%;
+    margin-left: 0;
+    transform: none;
+    align-items: center;
+  }
+
+  .resultLayout {
+    grid-template-columns: 1fr;
+    gap: clamp(6px, 1vh, 10px);
+  }
+
+  .characterPanel > div {
+    width: clamp(88px, 16vh, 128px);
+  }
+
+  .content {
+    gap: clamp(7px, 1vh, 10px);
+  }
+
+  .heading {
+    gap: 2px;
+  }
+
+  .heading h1 {
+    font-size: clamp(1.55rem, 7vw, 2rem);
+  }
+
+  .stars {
+    min-height: 30px;
+    font-size: clamp(1.45rem, 7vw, 1.85rem);
+  }
+
+  .summary {
+    gap: 7px;
+  }
+
+  .summaryItem {
+    min-height: 52px;
+    padding: 7px 9px;
+    border-radius: 15px;
+  }
+
+  .summaryItem span {
+    font-size: 0.75rem;
+  }
+
+  .summaryItem strong {
+    font-size: clamp(0.98rem, 4.2vw, 1.12rem);
+  }
+
+  .coinsItem {
+    min-height: 48px;
+    padding-inline: 12px;
+  }
+
+  .actions {
+    gap: 7px 8px;
+  }
+
+  .actions > button {
+    min-height: 46px;
+    padding: 8px 10px;
+    border-radius: 16px;
+    font-size: 0.96rem;
+  }
+
+  .homeLink {
+    min-height: 36px !important;
+  }
+}
+
+/* Short browser windows / small landscape displays */
+@media (min-width: 701px) and (max-height: 620px) {
+  .resultLayout {
+    gap: 28px;
+  }
+
+  .characterPanel > div {
+    width: clamp(155px, 30vh, 205px);
+  }
+
+  .content {
+    gap: 7px;
+  }
+
+  .heading {
+    gap: 1px;
+  }
+
+  .heading h1 {
+    font-size: 1.8rem;
+  }
+
+  .stars {
+    min-height: 30px;
+    font-size: 1.65rem;
+  }
+
+  .summary {
+    gap: 7px;
+  }
+
+  .summaryItem {
+    min-height: 50px;
+    padding: 7px 10px;
+  }
+
+  .coinsItem {
+    min-height: 46px;
+  }
+
+  .actions {
+    gap: 6px 8px;
+  }
+
+  .actions > button {
+    min-height: 44px;
+    padding-block: 7px;
+  }
+
+  .homeLink {
+    min-height: 34px !important;
+  }
+}

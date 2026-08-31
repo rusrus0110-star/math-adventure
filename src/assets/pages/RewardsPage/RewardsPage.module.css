@@ -1,0 +1,355 @@
+.page {
+  width: min(100%, 1000px);
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+  padding-bottom: 28px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.back,
+.sectionHeading button {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.coinCounter {
+  padding: 9px 14px;
+  border: 1px solid #f0cf78;
+  border-radius: 999px;
+  background: #fff4bd;
+  font-weight: 700;
+}
+
+.coinCounter strong {
+  font-size: 1.25rem;
+}
+
+.intro {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.intro > div:first-child {
+  flex: 0 0 auto;
+}
+
+.intro h1,
+.intro p {
+  margin: 0;
+}
+
+.intro p,
+.sectionHeading p {
+  color: var(--text-muted);
+}
+
+.wishCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 18px;
+  padding: 17px 20px;
+  border: 2px solid #f2d06f;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #fffefa, #fff3c2);
+  box-shadow: var(--shadow-soft);
+}
+
+.wishIcon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  aspect-ratio: 1;
+  border-radius: 22px;
+  background: rgb(255 255 255 / 0.78);
+  font-size: 3rem;
+}
+
+.wishInfo {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.wishInfo > span {
+  color: #816914;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wishInfo > strong {
+  font-size: 1.35rem;
+}
+
+.wishInfo small,
+.realRewardCard small {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.progressTrack,
+.miniProgress {
+  overflow: hidden;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgb(84 66 96 / 0.09);
+}
+
+.progressTrack {
+  height: 12px;
+}
+
+.progressFill,
+.weekFill,
+.miniProgress > div {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.progressFill,
+.miniProgress > div {
+  background: linear-gradient(90deg, #ffd34f, #ffad38);
+}
+
+.weekFill {
+  background: linear-gradient(90deg, #b99ae8, #8068cf);
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sectionHeading h2,
+.sectionHeading p {
+  margin: 0;
+}
+
+.sectionHeading p {
+  margin-top: 3px;
+  font-size: 0.9rem;
+}
+
+.rewardGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rewardCard {
+  min-width: 0;
+  display: grid;
+  gap: 9px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 7px 20px rgb(84 66 96 / 0.07);
+}
+
+.rewardCard.locked {
+  background: linear-gradient(150deg, #fff, #f8f6f3);
+}
+
+.rewardCard.selected {
+  border: 2px solid #e3b83f;
+  padding: 13px;
+  box-shadow: 0 8px 24px rgb(224 174 46 / 0.18);
+}
+
+.rewardIcon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.locked .rewardIcon {
+  filter: saturate(0.72);
+  opacity: 0.76;
+}
+
+.rewardTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rewardTitle span {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.rewardCard p {
+  min-height: 18px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.miniProgress {
+  height: 8px;
+}
+
+.cardActions button,
+.emptyWeeklyGoal {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cardActions button:disabled {
+  cursor: default;
+}
+
+.cardActions .activeButton {
+  border-color: #dfbc4d;
+  background: #fff2b7;
+}
+
+.realRewardSection {
+  padding-top: 6px;
+}
+
+.realRewardCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 17px 20px;
+  border: 1px solid #ddcdf0;
+  border-radius: 22px;
+  background: linear-gradient(140deg, #fff, #f4eaff);
+}
+
+.realRewardIcon {
+  font-size: 3rem;
+}
+
+.realRewardCard > div:last-child {
+  display: grid;
+  gap: 5px;
+}
+
+.realRewardCard strong {
+  font-size: 1.25rem;
+}
+
+.realRewardCard p {
+  margin: 0;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.emptyWeeklyGoal {
+  min-height: 70px;
+  border-style: dashed;
+  color: var(--text-muted);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  z-index: 20;
+  padding: 11px 17px;
+  border-radius: 999px;
+  background: #2e2a3b;
+  color: #fff;
+  font-weight: 800;
+  transform: translateX(-50%);
+  animation: toastLife 1.7s ease forwards;
+}
+
+@keyframes toastLife {
+  0% { opacity: 0; transform: translate(-50%, 8px); }
+  15%, 78% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -4px); }
+}
+
+@media (max-width: 700px) {
+  .page {
+    gap: 14px;
+  }
+
+  .intro {
+    gap: 10px;
+  }
+
+  .intro > div:first-child {
+    width: 96px;
+  }
+
+  .intro p {
+    font-size: 0.85rem;
+  }
+
+  .wishCard {
+    gap: 12px;
+    padding: 13px;
+    border-radius: 18px;
+  }
+
+  .wishIcon {
+    width: 58px;
+    border-radius: 16px;
+    font-size: 2.25rem;
+  }
+
+  .rewardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .rewardCard {
+    padding: 11px;
+    border-radius: 16px;
+  }
+
+  .rewardCard.selected {
+    padding: 10px;
+  }
+
+  .rewardTitle {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .sectionHeading {
+    align-items: flex-start;
+  }
+
+  .sectionHeading p {
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,73 @@
+import type { GameLevel } from './level.types';
+
+export const LEVELS: readonly GameLevel[] = [
+  {
+    id: 'addition-5',
+    order: 1,
+    titleKey: 'levels.addition5',
+    operation: 'addition',
+    minOperand: 0,
+    maxOperand: 5,
+    minResult: 1,
+    maxResult: 5,
+    questionCount: 10,
+    carryMode: 'no-carry',
+    unlockAccuracy: 0.8,
+  },
+  {
+    id: 'addition-10',
+    order: 2,
+    titleKey: 'levels.addition10',
+    operation: 'addition',
+    minOperand: 0,
+    maxOperand: 10,
+    minResult: 2,
+    maxResult: 10,
+    questionCount: 10,
+    carryMode: 'no-carry',
+    unlockAccuracy: 0.8,
+  },
+  {
+    id: 'addition-20',
+    order: 3,
+    titleKey: 'levels.addition20',
+    operation: 'addition',
+    minOperand: 2,
+    maxOperand: 12,
+    minResult: 11,
+    maxResult: 20,
+    questionCount: 10,
+    carryMode: 'carry',
+    unlockAccuracy: 0.8,
+  },
+  {
+    id: 'tens-100',
+    order: 4,
+    titleKey: 'levels.tens100',
+    operation: 'addition',
+    minOperand: 10,
+    maxOperand: 90,
+    minResult: 20,
+    maxResult: 100,
+    questionCount: 10,
+    carryMode: 'tens-only',
+    unlockAccuracy: 0.8,
+  },
+  {
+    id: 'addition-100',
+    order: 5,
+    titleKey: 'levels.addition100',
+    operation: 'addition',
+    minOperand: 10,
+    maxOperand: 89,
+    minResult: 20,
+    maxResult: 100,
+    questionCount: 10,
+    carryMode: 'any',
+    unlockAccuracy: 0.8,
+  },
+] as const;
+
+export function getLevelById(levelId: string): GameLevel | undefined {
+  return LEVELS.find((level) => level.id === levelId);
+}

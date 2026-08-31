@@ -1,0 +1,8 @@
+.page { display: grid; gap: 28px; }
+.page h1 { text-align: center; font-size: clamp(2rem, 8vw, 3rem); }
+.players { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 14px; }
+.playerCard { border: 0; border-radius: 22px; padding: 18px; background: var(--surface); box-shadow: var(--shadow-soft); font: inherit; cursor: pointer; display: grid; gap: 8px; }
+.avatar { font-size: 3rem; }
+.form { display: grid; gap: 12px; padding: 20px; border-radius: 24px; background: var(--surface); }
+.form input { min-height: 54px; border: 2px solid var(--border); border-radius: 16px; padding: 0 16px; font: inherit; font-size: 1.1rem; }
+.error { color: #a33; }

@@ -1,0 +1,1 @@
+.card { display: flex; justify-content: center; align-items: baseline; gap: 12px; padding: 24px 12px; border-radius: 26px; background: var(--surface); box-shadow: var(--shadow-soft); font-size: clamp(2.4rem, 13vw, 4.5rem); font-weight: 900; }

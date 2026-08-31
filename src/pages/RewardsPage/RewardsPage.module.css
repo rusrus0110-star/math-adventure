@@ -1,0 +1,4 @@
+.page { display: grid; gap: 20px; }
+.page > button { justify-self: start; border: 0; background: transparent; font: inherit; cursor: pointer; }
+.content { min-height: 60dvh; display: grid; place-content: center; justify-items: center; text-align: center; }
+.gift { font-size: 6rem; }
