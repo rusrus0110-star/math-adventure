@@ -9,8 +9,12 @@ import type { LearningAccount } from '@/domain/learning/learning';
 import { LEVELS } from '@/domain/progression/levels';
 import { DEFAULT_WEEKLY_REWARD_ID, getRealRewardById } from '@/domain/motivation/realRewards';
 import { createDailyActivity, type DailyActivity } from '@/domain/activity/dailyGoal';
+import type { ParentPinRecord } from '@/domain/parents/parentPin';
+import type { BonusProgress } from '@/features/bonusGame/bonusGame.types';
 
 export interface MathAdventureDb extends DBSchema {
+  settings: { key: string; value: ParentPinRecord };
+  bonusGames: { key: string; value: BonusProgress };
   dailyActivity: { key: [string, string]; value: DailyActivity; indexes: { 'by-player': string } };
   learning: { key: string; value: LearningAccount };
   players: { key: string; value: PlayerProfile };
@@ -22,9 +26,9 @@ export interface MathAdventureDb extends DBSchema {
   claims: { key: [string, string]; value: RewardClaim; indexes: { 'by-player': string } };
 }
 
-export const DATABASE_VERSION = 7;
+export const DATABASE_VERSION = 8;
 export type DatabaseProvider = () => Promise<IDBPDatabase<MathAdventureDb>>;
-type UpgradeTransaction = IDBPTransaction<MathAdventureDb, ('players' | 'progress' | 'sessions' | 'attempts' | 'motivation' | 'activity' | 'claims' | 'learning' | 'dailyActivity')[], 'versionchange'>;
+type UpgradeTransaction = IDBPTransaction<MathAdventureDb, ('players' | 'progress' | 'sessions' | 'attempts' | 'motivation' | 'activity' | 'claims' | 'learning' | 'dailyActivity' | 'settings' | 'bonusGames')[], 'versionchange'>;
 
 function legacyAccuracyStars(accuracy: number): number {
   if (!Number.isFinite(accuracy)) return 0;
@@ -90,6 +94,8 @@ async function migrate(transaction: UpgradeTransaction, oldVersion: number) {
 export function openDatabase(name = 'math-adventure-db'): Promise<IDBPDatabase<MathAdventureDb>> {
   return openDB<MathAdventureDb>(name, DATABASE_VERSION, {
     upgrade(database, oldVersion, _newVersion, transaction) {
+      if (!database.objectStoreNames.contains('settings')) database.createObjectStore('settings', { keyPath: 'id' });
+      if (!database.objectStoreNames.contains('bonusGames')) database.createObjectStore('bonusGames', { keyPath: 'playerId' });
       if (!database.objectStoreNames.contains('dailyActivity')) {
         database.createObjectStore('dailyActivity', { keyPath: ['playerId', 'localDate'] }).createIndex('by-player', 'playerId');
       }

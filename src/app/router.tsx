@@ -24,6 +24,7 @@ export const router = createBrowserRouter([
       { path: 'progress', element: <ProgressPage /> },
       { path: 'parents', element: <ParentPage /> },
       { path: 'rewards', element: <RewardsPage /> },
+      { path: 'bonus-game', lazy: async () => ({ Component: (await import('@/features/bonusGame/components/BonusGamePage')).BonusGamePage }) },
     ],
   },
 ]);

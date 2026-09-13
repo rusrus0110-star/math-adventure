@@ -14,9 +14,16 @@ import { t } from '@/shared/i18n';
 import { LearningProgress } from '@/features/learning/LearningProgress';
 import { MASTERY_VERSION } from '@/domain/game/services/masteryFeedback';
 import { isActiveDay } from '@/domain/activity/dailyGoal';
+import { ParentGate } from '@/features/parents/ParentGate';
+import { ChangePin } from '@/features/parents/ChangePin';
+import { ParentBonusCard } from '@/features/bonusGame/components/ParentBonusCard';
 import styles from '@/features/progress/dashboard.module.css';
 
 export function ParentPage() {
+  return <ParentGate><ParentDashboard /></ParentGate>;
+}
+
+function ParentDashboard() {
   const { player, progress, data, ready } = useDashboard();
   const players = usePlayerStore(state => state.players);
   const selectPlayer = usePlayerStore(state => state.selectPlayer);
@@ -45,6 +52,8 @@ export function ParentPage() {
       {!ready ? <p>Laden…</p> : <>
         <ProgressSummary progress={progress} sessions={data.sessions} />
         <LearningProgress parent />
+        <ParentBonusCard key={player.id} playerId={player.id} />
+        <ChangePin />
         <section className={styles.panel}><h2>Aktivität von {player.name}</h2>
           <p>{progress?.totalQuestionsAnswered ?? 0} Aufgaben · {progress?.totalCorrectAnswers ?? 0} richtig · Beste Serie: {progress?.bestStreak ?? 0}</p>
           <WeeklyActivity activities={data.activities} />

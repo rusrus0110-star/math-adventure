@@ -219,7 +219,7 @@ describe('weekly catalog migration', () => {
     previous.close();
 
     database = await openDatabase(name);
-    expect(database.version).toBe(7);
+    expect(database.version).toBe(8);
     expect(await database.get('progress', 'child')).toEqual({ ...progressBefore, levelStars: Object.fromEntries(LEVELS.map(level => [level.id, 0])) });
     expect(await Promise.all(unchangedStores.map(store => database.getAll(store)))).toEqual(before);
     for (const original of settings) {
