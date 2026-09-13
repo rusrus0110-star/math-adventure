@@ -3,6 +3,7 @@ import { useLearningStore } from './learningStore';
 import { LearningPath } from './LearningPath';
 import { DailyLearningPath } from './DailyLearningPath';
 import { DAILY_LEARNING_TARGET_MS, DAILY_ROUNDS_TARGET } from '@/domain/activity/dailyGoal';
+import { SecondaryNavButton } from '@/shared/components/SecondaryNavButton';
 
 export function LearningProgress({ parent = false }: { parent?: boolean }) {
   const playerId = usePlayerStore(state => state.activePlayer?.id);
@@ -16,5 +17,6 @@ export function LearningProgress({ parent = false }: { parent?: boolean }) {
     {learning.path && (parent && learning.account
       ? <section><h2>Lernzeit und Bonuszeit</h2><p>Aktive Lernzeit insgesamt: {Math.floor(learning.account.totalActiveMs / 60_000)} Min.</p><p>Bonuszeit verfügbar: {Math.floor(learning.account.bonusTimeMs / 60_000)} Min.</p></section>
       : <LearningPath path={learning.path} />)}
+    {!parent && learning.account && learning.account.bonusTimeMs > 0 && <SecondaryNavButton to="/bonus-game" label="Bonus-Spiel starten" icon="🎮" />}
   </>;
 }

@@ -16,7 +16,7 @@ Completion reads the existing session, progress, and activity inside one read/wr
 
 New sessions save `masteryVersion: "successful-rounds-v1"`, a previous-mastery snapshot, and the newly unlocked level ID, if any. Session `stars` is now a delta of zero or one, not an accuracy rating. A completed 10-question round with at least eight correct increments that level's persisted `progress.levelStars`, capped at seven. The first success independently unlocks the next level. Failures retain mastery. Retries return the original feedback without adding another star. Older records omit current-model feedback. Mastery awards no extra coins. Results animate only the newly earned star using CSS, respecting reduced-motion preferences.
 
-## Database version 7
+## Database version 8
 
 Upgrades from versions 1 and 2 preserve the existing players, progress, sessions, attempts, and motivation stores. The migration adds:
 
@@ -50,7 +50,7 @@ The learning domain owns the 15-minute learning cycle, 5-minute grant, 20-minute
 
 `LearningTracker` connects the actual `/game/:levelId` question state to the application clock. Home, rewards, parents, results, feedback, saving, and non-game routes are ineligible. Page Visibility and window focus exclude background time. Trusted pointer/keyboard interaction renews a 30-second idle window. Samples run every second; gaps above five seconds are discarded rather than crediting suspended/offline time. Cleanup flushes the final eligible interval. There is no component-owned timer or separate visual clock.
 
-One IndexedDB transaction updates `learningProgressMs`, `bonusTimeMs`, `totalActiveMs`, and the deduplication timestamp `lastCreditedAt`. Overlapping/retried intervals cannot earn twice. The store queues failed writes for retry and rejects stale player loads. A grant presents a completed path, then subsequent learning displays the persisted next-cycle remainder. At capacity the path stays full and additional learning cannot bank future overflow. Spending decreases only Bonuszeit; learning and coins are unaffected. The repository exposes spending, but this checkout has no playable Bonus-Spiel route yet.
+One IndexedDB transaction updates `learningProgressMs`, `bonusTimeMs`, `totalActiveMs`, and the deduplication timestamp `lastCreditedAt`. Overlapping/retried intervals cannot earn twice. The store queues failed writes for retry and rejects stale player loads. A grant presents a completed path, then subsequent learning displays the persisted next-cycle remainder. At capacity the path stays full and additional learning cannot bank future overflow. Spending decreases only Bonuszeit; learning and coins are unaffected. Bonus-Spiel checkpoints call the same spending domain function inside a transaction with the platformer run record.
 
 ## Daily training goal
 
@@ -60,9 +60,17 @@ Session completion increments its day's round counter in the existing atomic com
 
 `DailyLearningPath` displays a five-segment time path (one fifth of twenty minutes per segment) and five round markers as separate alternatives. Either complete path qualifies the day; partial paths are never added. It shares the Mia/path presentation with the bonus indicator, but neither owns a timer. Parent UI shows exact daily totals. The application tracker reloads the selected local day at midnight and on return from suspension; yesterday stays in storage and Bonuszeit carries over. Weekly displays and parent claims use the same qualification function.
 
+## Bonus-Spiel and parent access
+
+Version 8 adds `bonusGames` (per-player best score and idempotent run checkpoint) and `settings` (salted parent-PIN verifier). Upgrading from version 7 does not rewrite any existing store, reset mastery, or recreate the database. Tests compare every existing store before and after this upgrade.
+
+The isolated `features/bonusGame` domain owns physics, collision, camera and level state; its Canvas engine owns frame scheduling and rendering. `BonusSession` coordinates normal checkpoints through an application repository port, or uses only transient virtual time for authorized parent tests. Normal checkpoints atomically update the existing `learning.bonusTimeMs` and separate platformer progress. No math progression repository participates.
+
+Parent access uses Web Crypto PBKDF2 and an IndexedDB verifier, never a plaintext PIN or bundled password. Unlock and one-use test authorization remain in memory and disappear on reload. Query parameters cannot create a test session. See [Bonus-Spiel details](BONUS_GAME.md).
+
 ## Local persistence limits
 
-Data survives reloads and PWA reopening/reinstallation while browser origin storage remains. Deleting site data or the browser profile cannot be recovered without a backup. No backend or authentication is introduced.
+Data survives reloads and PWA reopening/reinstallation while browser origin storage remains. Deleting site data or the browser profile cannot be recovered without a backup. No backend or server authentication is introduced; the local parent gate is not a security boundary against browser developer tools or site-data deletion.
 
 ## Validation
 

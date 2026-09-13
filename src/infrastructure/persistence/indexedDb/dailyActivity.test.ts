@@ -28,9 +28,10 @@ beforeEach(async () => {
 afterEach(async () => { database.close(); await deleteDB(name); });
 
 describe('persistent daily goals', () => {
-  it('migrates version 6 history without resetting mastery, coins, Bonuszeit or claims', async () => {
+  it.each([6, 7])('migrates version %i without resetting mastery, coins, Bonuszeit or claims', async version => {
     database.close(); await deleteDB(name);
-    const previous = await openDB(name, 6, { upgrade(legacy) {
+    const previous = await openDB(name, version, { upgrade(legacy) {
+      if (version === 7) legacy.createObjectStore('dailyActivity', { keyPath: ['playerId', 'localDate'] }).createIndex('by-player', 'playerId');
       legacy.createObjectStore('players', { keyPath: 'id' });
       for (const store of ['progress', 'learning', 'motivation']) legacy.createObjectStore(store, { keyPath: 'playerId' });
       legacy.createObjectStore('sessions', { keyPath: 'id' }).createIndex('by-player', 'playerId');
@@ -52,13 +53,19 @@ describe('persistent daily goals', () => {
         if (round === 0) await previous.put('activity', { playerId: 'child', localDate: input.session.localDate, firstSessionId: input.session.id });
       }
     }
-    const stores = ['players', 'progress', 'learning', 'motivation', 'claims', 'activity', 'sessions', 'attempts'] as const;
+    if (version === 7) {
+      await previous.put('dailyActivity', { playerId: 'child', localDate: '2026-09-07', completedSessions: 5, activeLearningMs: 1234 });
+      await previous.put('dailyActivity', { playerId: 'child', localDate: '2026-09-08', completedSessions: 1, activeLearningMs: 5678 });
+    }
+    const stores = ['players', 'progress', 'learning', 'motivation', 'claims', 'activity', 'sessions', 'attempts', ...(version === 7 ? ['dailyActivity' as const] : [])] as const;
     const before = await Promise.all(stores.map(store => previous.getAll(store)));
     previous.close(); database = await openDatabase(name);
-    expect(database.version).toBe(7);
+    expect(database.version).toBe(8);
     expect(await Promise.all(stores.map(store => database.getAll(store)))).toEqual(before);
-    expect(await activity.getByDate('child', '2026-09-07')).toMatchObject({ completedSessions: 5, activeLearningMs: 0 });
-    expect(await activity.getByDate('child', '2026-09-08')).toMatchObject({ completedSessions: 1, activeLearningMs: 0 });
+    expect(await activity.getByDate('child', '2026-09-07')).toMatchObject({ completedSessions: 5, activeLearningMs: version === 7 ? 1234 : 0 });
+    expect(await activity.getByDate('child', '2026-09-08')).toMatchObject({ completedSessions: 1, activeLearningMs: version === 7 ? 5678 : 0 });
+    expect(await database.count('bonusGames')).toBe(0);
+    expect(await database.count('settings')).toBe(0);
     expect(weeklyActivity(await activity.listByPlayerId('child'), new Date(2026, 8, 9))).toEqual(['2026-09-07']);
     database.close(); database = await openDatabase(name);
     expect((await activity.getByDate('child', '2026-09-07')).completedSessions).toBe(5);
