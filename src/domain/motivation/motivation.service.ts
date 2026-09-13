@@ -1,6 +1,6 @@
-import type { GameSessionRecord } from '@/domain/game/game.types';
+import type { DailyActivity } from '@/domain/activity/dailyGoal';
 import type { MotivationSettings, VirtualReward, WeeklyGoalProgress } from './motivation.types';
-import { localDateKey, weeklyActivity } from '@/domain/activity/activity';
+import { weeklyActivity } from '@/domain/activity/activity';
 import { VIRTUAL_REWARDS } from './virtualRewards';
 import { DEFAULT_WEEKLY_REWARD_ID } from './realRewards';
 
@@ -27,10 +27,8 @@ export function rewardProgressPercent(reward: VirtualReward, coins: number): num
   return Math.max(0, Math.min(100, Math.round(coins / reward.thresholdCoins * 100)));
 }
 
-export function calculateWeeklyGoalProgress(sessions: readonly GameSessionRecord[], requiredDays: number, now = new Date()): WeeklyGoalProgress {
-  const dayKeys = weeklyActivity(sessions
-    .filter(session => session.correctAnswers + session.wrongAnswers === 10)
-    .map(session => ({ localDate: session.localDate || localDateKey(new Date(session.completedAt)) })), now);
+export function calculateWeeklyGoalProgress(activities: readonly DailyActivity[], requiredDays: number, now = new Date()): WeeklyGoalProgress {
+  const dayKeys = weeklyActivity(activities, now);
   const safeRequiredDays = Number.isFinite(requiredDays) ? Math.min(7, Math.max(3, Math.round(requiredDays))) : 4;
   return { completedDays: dayKeys.length, requiredDays: safeRequiredDays, completed: dayKeys.length >= safeRequiredDays, dayKeys };
 }

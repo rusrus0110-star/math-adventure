@@ -191,6 +191,8 @@
 }
 
 .progressArea {
+  display: grid;
+  gap: 10px;
   padding-bottom: 1px;
 }
 

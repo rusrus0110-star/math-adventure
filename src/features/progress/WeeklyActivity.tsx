@@ -1,9 +1,9 @@
 import { localDateKey, weekDates, WEEKDAY_LABELS } from '@/domain/activity/activity';
-import type { ActivityDay } from '@/domain/activity/activity';
+import { isActiveDay, type DailyActivity } from '@/domain/activity/dailyGoal';
 import styles from './dashboard.module.css';
 
-export function WeeklyActivity({ activities }: { activities: readonly ActivityDay[] }) {
-  const active = new Set(activities.map(day => day.localDate));
+export function WeeklyActivity({ activities }: { activities: readonly DailyActivity[] }) {
+  const active = new Set(activities.filter(isActiveDay).map(day => day.localDate));
   const today = localDateKey();
   return (
     <div className={styles.week} aria-label="Trainingstage dieser Woche">

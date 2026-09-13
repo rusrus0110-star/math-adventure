@@ -28,6 +28,7 @@ export interface QuestionAttempt {
 }
 
 export interface GameSessionRecord {
+  masteryVersion?: string;
   questionSetVersion?: string;
   mastery?: MasterySnapshot;
   stars: number;

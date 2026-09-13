@@ -44,7 +44,7 @@ export function RewardCollection({ playerId, coins, tab, parent = false }: { pla
         })}</div>
       </>}
       {tab === 'Wochenziel' && <>
-        <p>Eine ganze Runde macht deinen Tag aktiv — auch wenn du Fehler machst. Jeder Tag zählt einmal.</p>
+        <p>Schaffe deinen täglichen Lernweg oder spiele fünf ganze Runden. Dann zählt dein Trainingstag — Fehler sind erlaubt!</p>
         {settings.weeklyGoalEnabled || weeklyClaim ? <RewardCard name={weeklyName} icon={weeklyReward?.icon ?? '⭐'}
           current={store.weeklyProgress?.completedDays ?? 0} target={settings.weeklyRequiredDays} unit="Trainingstage"
           state={rewardState(Boolean(settings.weeklyGoalEnabled && store.weeklyProgress?.completed), Boolean(weeklyClaim))}

@@ -1,14 +1,14 @@
 import type { GameCompletionRepository } from '@/application/ports/GameCompletionRepository';
 import type { GameSessionRecord, QuestionAttempt } from '@/domain/game/game.types';
-import { calculateCoins, calculateStars } from '@/domain/game/services/calculateRewards';
+import { calculateCoins, calculateMasteryGain } from '@/domain/game/services/calculateRewards';
 import { applySessionProgress } from '@/domain/game/services/applySessionProgress';
 import { dailyActivityBonus } from '@/domain/activity/activity';
 import { createInitialProgress } from '@/domain/progression/progression.service';
-import { calculateMasteryFeedback } from '@/domain/game/services/masteryFeedback';
+import { calculateMasteryFeedback, MASTERY_VERSION } from '@/domain/game/services/masteryFeedback';
 import { CURRENT_QUESTION_SET_VERSION, isCurrentCurriculumSession } from '@/domain/game/curriculum';
 
 export interface CompleteGameSessionInput {
-  session: Omit<GameSessionRecord, 'coinsEarned' | 'stars' | 'activityCoins' | 'mastery'>;
+  session: Omit<GameSessionRecord, 'coinsEarned' | 'stars' | 'activityCoins' | 'mastery' | 'masteryVersion'>;
   attempts: readonly QuestionAttempt[];
 }
 
@@ -35,14 +35,15 @@ export async function completeGameSession(input: CompleteGameSessionInput, depen
   if (!/^\d{4}-\d{2}-\d{2}$/.test(localDate)) throw new Error('Ungültiger lokaler Trainingstag.');
   const persisted = await dependencies.gameCompletionRepository.saveCompletion(session.id, session.playerId, localDate, (progress, alreadyActive) => {
     const activityCoins = dailyActivityBonus(alreadyActive, attempts.length);
+    const previousProgress = progress ?? createInitialProgress(session.playerId);
     const record: GameSessionRecord = {
       ...session,
       localDate,
-      stars: calculateStars(correctAnswers / 10),
+      masteryVersion: MASTERY_VERSION,
+      stars: calculateMasteryGain(previousProgress.levelStars[session.levelId] ?? 0, correctAnswers),
       activityCoins,
       coinsEarned: calculateCoins(correctAnswers, 10) + activityCoins,
     };
-    const previousProgress = progress ?? createInitialProgress(session.playerId);
     const updatedProgress = applySessionProgress(previousProgress, record);
     const mastery = {
       previousBestStars: previousProgress.levelStars[session.levelId] ?? 0,
@@ -59,6 +60,6 @@ export async function completeGameSession(input: CompleteGameSessionInput, depen
     stars: persisted.stars,
     coinsEarned: persisted.coinsEarned,
     activityCoins: persisted.activityCoins,
-    mastery: persisted.mastery && isCurrentCurriculumSession(persisted) ? calculateMasteryFeedback(persisted.stars, persisted.mastery) : null,
+    mastery: persisted.mastery && persisted.masteryVersion === MASTERY_VERSION && isCurrentCurriculumSession(persisted) ? calculateMasteryFeedback(persisted.stars, persisted.mastery) : null,
   };
 }

@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { calculateCoins, calculateStars } from './calculateRewards';
+import { calculateCoins, calculateMasteryGain } from './calculateRewards';
 import { createInitialProgress, unlockNextLevel } from '@/domain/progression/progression.service';
 
 describe('seven-star mastery', () => {
-  it.each([0, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7].map((stars, correct) => ({ stars, correct })))('$correct correct gives $stars stars', ({ correct, stars }) => {
-    expect(calculateStars(correct / 10)).toBe(stars);
+  it.each([0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1].map((stars, correct) => ({ stars, correct })))('$correct correct gives $stars stars', ({ correct, stars }) => {
+    expect(calculateMasteryGain(0, correct)).toBe(stars);
   });
-  it('unlocks at 80%, which is five of seven stars', () => {
-    expect(calculateStars(0.8)).toBe(5);
+  it('unlocks at 80%, which earns one mastery star', () => {
+    expect(calculateMasteryGain(0, 8)).toBe(1);
     expect(unlockNextLevel(createInitialProgress('child'), 'addition-5', 0.8).unlockedLevelIds).toContain('addition-10');
     expect(unlockNextLevel(createInitialProgress('child'), 'addition-5', 0.7).unlockedLevelIds).not.toContain('addition-10');
   });

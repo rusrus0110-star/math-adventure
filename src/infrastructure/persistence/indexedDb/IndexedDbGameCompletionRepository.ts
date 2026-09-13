@@ -1,4 +1,5 @@
 import type { GameCompletionRepository } from '@/application/ports/GameCompletionRepository';
+import { createDailyActivity } from '@/domain/activity/dailyGoal';
 import { getDatabase, type DatabaseProvider } from './database';
 
 export class IndexedDbGameCompletionRepository implements GameCompletionRepository {
@@ -11,7 +12,7 @@ export class IndexedDbGameCompletionRepository implements GameCompletionReposito
     calculate: Parameters<GameCompletionRepository['saveCompletion']>[3],
   ) {
     const database = await this.databaseProvider();
-    const transaction = database.transaction(['attempts', 'sessions', 'progress', 'activity'], 'readwrite');
+    const transaction = database.transaction(['attempts', 'sessions', 'progress', 'activity', 'dailyActivity'], 'readwrite');
     try {
       const existing = await transaction.objectStore('sessions').get(sessionId);
       if (existing) {
@@ -28,6 +29,8 @@ export class IndexedDbGameCompletionRepository implements GameCompletionReposito
       await transaction.objectStore('sessions').add(completion.session);
       await transaction.objectStore('progress').put(completion.progress);
       if (!activity) await transaction.objectStore('activity').add(completion.activity);
+      const day = await transaction.objectStore('dailyActivity').get([playerId, localDate]) ?? createDailyActivity(playerId, localDate);
+      await transaction.objectStore('dailyActivity').put({ ...day, completedSessions: day.completedSessions + 1 });
       await transaction.done;
       return completion.session;
     } catch (error) {

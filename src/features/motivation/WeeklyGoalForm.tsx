@@ -37,7 +37,7 @@ export function WeeklyGoalForm({ settings }: { settings: MotivationSettings }) {
           <select value={days} onChange={event => setDays(Number(event.target.value))}>{[3, 4, 5, 6, 7].map(day => <option key={day} value={day}>{day} Tage</option>)}</select>
         </label>
       </fieldset>
-      <p>Eine abgeschlossene 10-Aufgaben-Runde zählt als Trainingstag, unabhängig von Fehlern. Mehrere Runden am selben Tag zählen einmal.</p>
+      <p>Ein Trainingstag zählt nach 5 vollständigen Runden mit je 10 Aufgaben oder 20 Minuten aktiver Lernzeit. Fehler sind erlaubt. Jeder lokale Kalendertag zählt einmal.</p>
       {error && <p role="alert">{error}</p>}{message && <p role="status">{message}</p>}
       <PrimaryButton type="submit" disabled={busy}>{busy ? 'Speichern…' : 'Wochenziel speichern'}</PrimaryButton>
     </form>

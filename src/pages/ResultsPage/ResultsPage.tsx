@@ -45,12 +45,16 @@ export function ResultsPage() {
 
     let cancelled = false;
 
-    void dependencies.sessionRepository.listByPlayerId(player.id).then((sessions) => {
+    void Promise.all([
+      dependencies.sessionRepository.listByPlayerId(player.id),
+      dependencies.activityRepository.listByPlayerId(player.id),
+    ]).then(([sessions, days]) => {
       if (cancelled) return;
 
-      const current = calculateWeeklyGoalProgress(sessions, activeMotivation.weeklyRequiredDays);
+      const session = sessions.find(candidate => candidate.id === result.sessionId);
+      const current = calculateWeeklyGoalProgress(days, activeMotivation.weeklyRequiredDays);
       const before = calculateWeeklyGoalProgress(
-        sessions.filter((session) => session.id !== result.sessionId),
+        days.map(day => day.localDate === session?.localDate ? { ...day, completedSessions: Math.max(0, day.completedSessions - 1) } : day),
         activeMotivation.weeklyRequiredDays,
       );
 
@@ -98,7 +102,7 @@ export function ResultsPage() {
               <p>{Math.round(result.correctAnswers / result.questionCount * 100)} % richtig</p>
             </header>
 
-            <MasterySummary key={result.sessionId} sessionStars={result.stars} mastery={result.mastery} />
+            <MasterySummary key={result.sessionId} mastery={result.mastery} />
 
             <div className={styles.summary}>
               <div className={styles.summaryItem}>

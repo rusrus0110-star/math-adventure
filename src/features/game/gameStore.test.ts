@@ -8,7 +8,7 @@ vi.mock('@/app/dependencies', () => ({ dependencies: {} }));
 vi.mock('@/application/game/completeGameSession', () => ({ completeGameSession: vi.fn() }));
 const save = vi.mocked(completeGameSession);
 const level = LEVELS[0]!;
-const completion = { stars: 7, coinsEarned: 24, activityCoins: 5, mastery: calculateMasteryFeedback(7, { previousBestStars: 0, unlockedLevelId: 'addition-10' }) };
+const completion = { stars: 1, coinsEarned: 24, activityCoins: 5, mastery: calculateMasteryFeedback(1, { previousBestStars: 0, unlockedLevelId: 'addition-10' }) };
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -56,7 +56,7 @@ describe('game session lifecycle', () => {
     vi.setSystemTime(new Date(2026, 8, 15));
     expect(await useGameStore.getState().retrySave()).toBe(true);
     expect(save.mock.calls[1]![0]).toEqual(firstInput);
-    expect(useGameStore.getState().result?.stars).toBe(7);
+    expect(useGameStore.getState().result?.stars).toBe(1);
     expect(useGameStore.getState().result?.mastery).toEqual(completion.mastery);
     expect(useGameStore.getState().attempts.filter(attempt => attempt.operation === 'subtraction')).toHaveLength(5);
   });

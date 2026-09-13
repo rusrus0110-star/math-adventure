@@ -24,7 +24,7 @@ export function LevelsPage() {
       <section className={styles.page}>
         <BackButton onClick={() => navigate('/home')} />
         <h1>{t('levels.title')}</h1>
-        <p>10 Aufgaben: 5 Plus und 5 Minus. Mit 8 richtigen Antworten (5/7 Sterne) öffnet sich das nächste Level.</p>
+        <p>Mit mindestens 8 von 10 richtigen Antworten sammelst du einen Stern und öffnest das nächste Level. Sieben erfolgreiche Runden meistern ein Level!</p>
         <div className={styles.list}>
           {LEVELS.map((level) => {
             const unlocked = progress?.unlockedLevelIds.includes(level.id) ?? level.order === 1;

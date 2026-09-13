@@ -12,6 +12,7 @@ import { usePlayerStore } from '@/features/player/playerStore';
 import { AppShell } from '@/shared/components/AppShell';
 import { PrimaryButton } from '@/shared/components/PrimaryButton';
 import { t } from '@/shared/i18n';
+import { LearningProgress } from '@/features/learning/LearningProgress';
 import styles from './HomePage.module.css';
 
 export function HomePage() {
@@ -70,6 +71,7 @@ export function HomePage() {
           </section>
 
           <section className={styles.goalsPanel}>
+            <LearningProgress />
             <button className={styles.goalCard} onClick={() => navigate('/rewards')}>
               <div className={styles.goalHeader}>
                 <span>{t('motivation.myWish')}</span>

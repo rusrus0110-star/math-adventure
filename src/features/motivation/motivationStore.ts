@@ -1,9 +1,8 @@
 import { create } from 'zustand';
 import { dependencies } from '@/app/dependencies';
-import { createDefaultMotivationSettings, isRewardUnlocked } from '@/domain/motivation/motivation.service';
+import { calculateWeeklyGoalProgress, createDefaultMotivationSettings, isRewardUnlocked } from '@/domain/motivation/motivation.service';
 import type { MotivationSettings, WeeklyGoalProgress } from '@/domain/motivation/motivation.types';
-import type { ActivityDay } from '@/domain/activity/activity';
-import { weeklyActivity } from '@/domain/activity/activity';
+import type { DailyActivity } from '@/domain/activity/dailyGoal';
 import type { GameSessionRecord } from '@/domain/game/game.types';
 import type { RewardClaim } from '@/domain/motivation/superPrizes';
 import { getRealRewardById } from '@/domain/motivation/realRewards';
@@ -19,7 +18,7 @@ interface MotivationState {
   playerId: string | null;
   settings: MotivationSettings | null;
   weeklyProgress: WeeklyGoalProgress | null;
-  activities: ActivityDay[];
+  activities: DailyActivity[];
   sessions: GameSessionRecord[];
   claims: RewardClaim[];
   isLoading: boolean;
@@ -53,8 +52,7 @@ export const useMotivationStore = create<MotivationState>((set, get) => ({
         readSettings(playerId), dependencies.activityRepository.listByPlayerId(playerId),
         dependencies.sessionRepository.listByPlayerId(playerId), dependencies.rewardClaimRepository.listByPlayerId(playerId),
       ]);
-      const dayKeys = weeklyActivity(activities);
-      const weeklyProgress = { dayKeys, completedDays: dayKeys.length, requiredDays: settings.weeklyRequiredDays, completed: dayKeys.length >= settings.weeklyRequiredDays };
+      const weeklyProgress = calculateWeeklyGoalProgress(activities, settings.weeklyRequiredDays);
       if (version === loadVersion) set({ playerId, settings, activities, sessions: sessions.sort((left, right) => right.completedAt.localeCompare(left.completedAt)), claims, weeklyProgress, isLoading: false });
     } catch (error) {
       if (version === loadVersion) set({ isLoading: false, error: error instanceof Error ? error.message : 'Fortschritt konnte nicht geladen werden.' });

@@ -1,4 +1,5 @@
 import { IndexedDbActivityRepository } from '@/infrastructure/persistence/indexedDb/IndexedDbActivityRepository';
+import { IndexedDbLearningRepository } from '@/infrastructure/persistence/indexedDb/IndexedDbLearningRepository';
 import { IndexedDbRewardClaimRepository } from '@/infrastructure/persistence/indexedDb/IndexedDbRewardClaimRepository';
 import { IndexedDbMotivationRepository } from '@/infrastructure/persistence/indexedDb/IndexedDbMotivationRepository';
 import { IndexedDbAttemptRepository } from '@/infrastructure/persistence/indexedDb/IndexedDbAttemptRepository';
@@ -8,6 +9,7 @@ import { IndexedDbProgressRepository } from '@/infrastructure/persistence/indexe
 import { IndexedDbSessionRepository } from '@/infrastructure/persistence/indexedDb/IndexedDbSessionRepository';
 
 export const dependencies = {
+  learningRepository: new IndexedDbLearningRepository(),
   activityRepository: new IndexedDbActivityRepository(),
   rewardClaimRepository: new IndexedDbRewardClaimRepository(),
   motivationRepository: new IndexedDbMotivationRepository(),

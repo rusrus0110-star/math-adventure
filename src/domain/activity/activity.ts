@@ -1,3 +1,5 @@
+import { isActiveDay, type DailyActivity } from './dailyGoal';
+
 export const DAILY_ACTIVITY_COINS = 5;
 export const WEEKDAY_LABELS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'] as const;
 
@@ -22,9 +24,9 @@ export function weekDates(now = new Date()): string[] {
   });
 }
 
-export function weeklyActivity(days: readonly Pick<ActivityDay, 'localDate'>[], now = new Date()): string[] {
+export function weeklyActivity(days: readonly Pick<DailyActivity, 'localDate' | 'completedSessions' | 'activeLearningMs'>[], now = new Date()): string[] {
   const week = new Set(weekDates(now));
-  return [...new Set(days.map(day => day.localDate).filter(date => week.has(date)))].sort();
+  return [...new Set(days.filter(isActiveDay).map(day => day.localDate).filter(date => week.has(date)))].sort();
 }
 
 export function dailyActivityBonus(alreadyActive: boolean, questionCount: number): number {

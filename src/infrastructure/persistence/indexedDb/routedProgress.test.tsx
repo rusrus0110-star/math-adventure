@@ -160,8 +160,8 @@ describe('persisted progress through the real levels page', () => {
     expect(markup).not.toContain('disabled');
   });
 
-  it('persists per-level 3/7, 5/7 and 7/7 and does not reduce mastery on a worse replay', async () => {
-    for (const [levelId, correct] of [['addition-5', 6], ['addition-10', 8], ['addition-20', 10]] as const) {
+  it('persists independent cumulative mastery through the repository, player store and routed page', async () => {
+    for (const [levelId, correct] of [['addition-5', 6], ['addition-10', 8], ['addition-20', 10], ['addition-20', 9], ['addition-20', 0]] as const) {
       const input = sessionInput('child', correct);
       await completeGameSession({ session: { ...input.session, levelId }, attempts: input.attempts.map(attempt => ({ ...attempt, levelId })) }, dependencies);
     }
@@ -170,13 +170,12 @@ describe('persisted progress through the real levels page', () => {
     database = await openDatabase(name);
     await usePlayerStore.getState().initialize();
     const progress = (await database.get('progress', 'child'))!;
-    expect(progress.levelStars).toEqual({ 'addition-5': 3, 'addition-10': 5, 'addition-20': 7 });
+    expect(progress.levelStars).toEqual({ 'addition-5': 0, 'addition-10': 1, 'addition-20': 2 });
     expect(usePlayerStore.getState().progress).toEqual(progress);
     const markup = renderRoute('/levels');
-    expect(markup).toContain('aria-label="3 von 7 Sternen">★★★☆☆☆☆');
-    expect(markup).toContain('aria-label="5 von 7 Sternen">★★★★★☆☆');
-    expect(markup).toContain('aria-label="7 von 7 Sternen">★★★★★★★');
-    expect(markup.match(/☆☆☆☆☆☆☆/g)).toHaveLength(2);
+    expect(markup).toContain('aria-label="1 von 7 Sternen">★☆☆☆☆☆☆');
+    expect(markup).toContain('aria-label="2 von 7 Sternen">★★☆☆☆☆☆');
+    expect(markup.match(/☆☆☆☆☆☆☆/g)).toHaveLength(3);
     expect((await database.getAll('sessions')).every(session => session.questionSetVersion === 'mixed-v1')).toBe(true);
   });
 
@@ -186,9 +185,9 @@ describe('persisted progress through the real levels page', () => {
     expect(renderRoute('/levels').match(/☆☆☆☆☆☆☆/g)).toHaveLength(5);
     await completeGameSession(sessionInput('child', 8), dependencies);
     await usePlayerStore.getState().refreshProgress();
-    expect(usePlayerStore.getState().progress).toMatchObject({ levelStars: { 'addition-5': 5 }, unlockedLevelIds: ['addition-5', 'addition-10'] });
+    expect(usePlayerStore.getState().progress).toMatchObject({ levelStars: { 'addition-5': 1 }, unlockedLevelIds: ['addition-5', 'addition-10'] });
     const markup = renderRoute('/levels');
-    expect(markup).toContain('★★★★★☆☆');
+    expect(markup).toContain('★☆☆☆☆☆☆');
     expect(markup.match(/disabled=""/g)).toHaveLength(3);
   });
 });

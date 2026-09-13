@@ -9,6 +9,7 @@ import { useMotivationStore } from '@/features/motivation/motivationStore';
 import { usePlayerStore } from '@/features/player/playerStore';
 import { AppShell } from '@/shared/components/AppShell';
 import { t } from '@/shared/i18n';
+import { LearningProgress } from '@/features/learning/LearningProgress';
 import styles from './GamePage.module.css';
 
 export function GamePage() {
@@ -186,6 +187,7 @@ export function GamePage() {
         </main>
 
         <footer className={styles.progressArea}>
+          <LearningProgress />
           <div className={styles.progressTrack} aria-hidden="true">
             <div
               className={styles.progressFill}

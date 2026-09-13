@@ -60,12 +60,12 @@ describe('transactional session completion', () => {
   it('does not lose progress or duplicate daily bonuses across concurrent sessions', async () => {
     const results = await Promise.all([finish(), finish()]);
     expect(results.reduce((sum, result) => sum + result.activityCoins, 0)).toBe(5);
-    expect(results.filter(result => result.mastery?.isNewBest)).toHaveLength(1);
+    expect(results.filter(result => result.mastery?.isNewBest)).toHaveLength(2);
     expect(results.filter(result => result.mastery?.unlockedLevelId)).toHaveLength(1);
     const progress = await database.get('progress', 'child');
     expect(progress?.coins).toBe(31);
     expect(progress?.totalQuestionsAnswered).toBe(20);
-    expect(progress?.levelStars['addition-5']).toBe(5);
+    expect(progress?.levelStars['addition-5']).toBe(2);
     expect(progress?.unlockedLevelIds).toContain('addition-10');
   });
   it('keeps players independent', async () => {
@@ -92,30 +92,50 @@ describe('transactional session completion', () => {
 });
 
 describe('persisted mastery feedback', () => {
-  it('captures improvement from four to six stars without extra mastery coins', async () => {
+  it.each([8, 9, 10])('awards exactly one first mastery star for %i correct answers', async correct => {
+    expect(await finish(sessionInput('child', correct))).toMatchObject({ stars: 1, mastery: { newBestStars: 1, unlockedLevelId: 'addition-10' } });
+    expect((await database.get('progress', 'child'))?.levelStars['addition-5']).toBe(1);
+    expect(await database.get('progress', 'another-child')).toBeUndefined();
+  });
+  it('needs seven successes, retains mastery on failures and caps the eighth success', async () => {
+    expect((await finish(sessionInput('child', 7))).stars).toBe(0);
+    for (let round = 1; round <= 8; round += 1) {
+      const input = sessionInput('child', 10);
+      const result = await finish(input);
+      expect(result).toMatchObject({ stars: round <= 7 ? 1 : 0, mastery: {
+        previousBestStars: Math.min(7, round - 1), newBestStars: Math.min(7, round),
+        fullMastery: round >= 7, unlockedLevelId: round === 1 ? 'addition-10' : null,
+      } });
+      expect(await finish(input)).toEqual(result);
+      expect((await finish(sessionInput('child', 0))).mastery?.newBestStars).toBe(Math.min(7, round));
+      expect((await database.get('progress', 'child'))?.levelStars['addition-5']).toBe(Math.min(7, round));
+    }
+    expect((await finish(sessionInput('another-child', 10))).mastery?.newBestStars).toBe(1);
+  });
+  it('captures a single-star improvement without extra mastery coins', async () => {
     await database.put('progress', { ...createInitialProgress('child'), levelStars: { 'addition-5': 4 } });
     const result = await finish(sessionInput('child', 9));
-    expect(result).toMatchObject({ stars: 6, coinsEarned: 21, activityCoins: 5, mastery: {
-      previousBestStars: 4, sessionStars: 6, newBestStars: 6, isNewBest: true,
-      newStarNumbers: [5, 6], unlockedLevelId: 'addition-10', fullMastery: false,
+    expect(result).toMatchObject({ stars: 1, coinsEarned: 21, activityCoins: 5, mastery: {
+      previousBestStars: 4, sessionStars: 1, newBestStars: 5, isNewBest: true,
+      newStarNumbers: [5], unlockedLevelId: 'addition-10', fullMastery: false,
     } });
   });
-  it('unlocks the next level at five stars only once, including equal and worse replays', async () => {
-    expect((await finish()).mastery).toMatchObject({ sessionStars: 5, isNewBest: true, unlockedLevelId: 'addition-10' });
+  it('unlocks once and adds stars only on successful replays', async () => {
+    expect((await finish()).mastery).toMatchObject({ sessionStars: 1, newBestStars: 1, isNewBest: true, unlockedLevelId: 'addition-10' });
     expect(await finish()).toMatchObject({ coinsEarned: 13, activityCoins: 0, mastery: {
-      previousBestStars: 5, sessionStars: 5, newBestStars: 5, isNewBest: false, newStarNumbers: [], unlockedLevelId: null,
+      previousBestStars: 1, sessionStars: 1, newBestStars: 2, isNewBest: true, newStarNumbers: [2], unlockedLevelId: null,
     } });
-    expect((await finish(sessionInput('child', 7))).mastery).toMatchObject({ sessionStars: 4, newBestStars: 5, isNewBest: false, newStarNumbers: [], unlockedLevelId: null });
+    expect((await finish(sessionInput('child', 7))).mastery).toMatchObject({ sessionStars: 0, newBestStars: 2, isNewBest: false, newStarNumbers: [], unlockedLevelId: null });
   });
   it('preserves original feedback on retries after later progress and database reopening', async () => {
     const first = sessionInput();
     const original = await finish(first);
-    expect((await finish(sessionInput('child', 10))).mastery).toMatchObject({ previousBestStars: 5, newStarNumbers: [6, 7], fullMastery: true, unlockedLevelId: null });
+    expect((await finish(sessionInput('child', 10))).mastery).toMatchObject({ previousBestStars: 1, newStarNumbers: [2], fullMastery: false, unlockedLevelId: null });
     database.close();
     database = await openDatabase(name);
     expect(await finish(first)).toEqual(original);
     expect(await database.count('sessions')).toBe(2);
-    expect((await database.get('progress', 'child'))?.levelStars['addition-5']).toBe(7);
+    expect((await database.get('progress', 'child'))?.levelStars['addition-5']).toBe(2);
   });
   it('keeps legacy session rewards without inventing historical improvement events', async () => {
     const input = sessionInput();
@@ -153,6 +173,9 @@ describe('explicit reward claims', () => {
     await finish(sessionInput('child', 0, new Date(2026, 8, 8, 12)));
     await finish(sessionInput('child', 0, new Date(2026, 8, 9, 12)));
     expect(await claims.listByPlayerId('child')).toHaveLength(0);
+    for (const day of [7, 8, 9]) {
+      for (let round = day === 7 ? 2 : 1; round < 5; round += 1) await finish(sessionInput('child', 0, new Date(2026, 8, day, 14)));
+    }
     await claims.claim('child', key, now);
     expect((await claims.listByPlayerId('child'))[0]?.rewardName).toBe('Eis essen');
     await expect(claims.claim('child', 'weekly:2026-09-14', new Date(2026, 8, 14))).rejects.toThrow();
@@ -160,7 +183,7 @@ describe('explicit reward claims', () => {
 });
 
 describe('weekly catalog migration', () => {
-  it('migrates invalid version-4 selections without changing progress, history, or valid selections', async () => {
+  it('migrates invalid version-4 selections and resets only mastery, preserving valid selections and history', async () => {
     database.close();
     await deleteDB(name);
     const previous = await openDB<MathAdventureDb>(name, 4, {
@@ -190,12 +213,14 @@ describe('weekly catalog migration', () => {
     for (const attempt of input.attempts) await previous.put('attempts', attempt);
     await previous.put('activity', { playerId: 'child', localDate: input.session.localDate, firstSessionId: input.session.id });
     await previous.put('claims', { playerId: 'child', rewardKey: 'super:ice-cream', rewardName: 'Eis essen', claimedAt: input.session.completedAt });
-    const unchangedStores = ['players', 'progress', 'sessions', 'attempts', 'activity', 'claims'] as const;
+    const unchangedStores = ['players', 'sessions', 'attempts', 'activity', 'claims'] as const;
     const before = await Promise.all(unchangedStores.map(store => previous.getAll(store)));
+    const progressBefore = await previous.get('progress', 'child');
     previous.close();
 
     database = await openDatabase(name);
-    expect(database.version).toBe(5);
+    expect(database.version).toBe(7);
+    expect(await database.get('progress', 'child')).toEqual({ ...progressBefore, levelStars: Object.fromEntries(LEVELS.map(level => [level.id, 0])) });
     expect(await Promise.all(unchangedStores.map(store => database.getAll(store)))).toEqual(before);
     for (const original of settings) {
       expect(await database.get('motivation', original.playerId)).toEqual(invalidIds.includes(original.weeklyRewardId)
@@ -266,16 +291,16 @@ describe('versioned migrations', () => {
     if (version >= 2) expect(await database.get('motivation', 'child')).toMatchObject({ weeklyGoalEnabled: true, equippedVirtualRewardId: 'bow' });
     if (version === 3) {
       expect(await database.get('claims', ['child', 'super:ice-cream'])).toMatchObject({ rewardName: 'Eis essen', claimedAt: input.session.completedAt });
-      expect((await database.get('progress', 'mixed-child'))?.levelStars).toEqual({ 'addition-5': 5, 'addition-10': 3, 'addition-20': 0, 'tens-100': 0, 'addition-100': 0 });
+      expect((await database.get('progress', 'mixed-child'))?.levelStars).toEqual({ 'addition-5': 0, 'addition-10': 0, 'addition-20': 0, 'tens-100': 0, 'addition-100': 0 });
       expect((await database.get('progress', 'no-history'))?.levelStars).toEqual({ 'addition-5': 0, 'addition-10': 0, 'addition-20': 0, 'tens-100': 0, 'addition-100': 0, 'archived-level': 2 });
     }
     expect((await finish(sessionInput()))).toMatchObject({ activityCoins: 0, coinsEarned: 13 });
-    expect((await database.get('progress', 'child'))?.levelStars).toEqual({ 'addition-5': 5, 'addition-10': 0, 'addition-20': 0, 'tens-100': 0, 'addition-100': 0 });
+    expect((await database.get('progress', 'child'))?.levelStars).toEqual({ 'addition-5': 1, 'addition-10': 0, 'addition-20': 0, 'tens-100': 0, 'addition-100': 0 });
     database.close();
     database = await openDatabase(name);
     expect((await database.get('progress', 'child'))?.coins).toBe(136);
-    expect((await database.get('progress', 'child'))?.levelStars['addition-5']).toBe(5);
+    expect((await database.get('progress', 'child'))?.levelStars['addition-5']).toBe(1);
     await finish(sessionInput('child', 6));
-    expect((await database.get('progress', 'child'))?.levelStars['addition-5']).toBe(5);
+    expect((await database.get('progress', 'child'))?.levelStars['addition-5']).toBe(1);
   });
 });

@@ -29,7 +29,7 @@ describe('child-facing components', () => {
   });
   it('labels all seven weekdays and marks activity independently of today', () => {
     const date = weekDates()[0]!;
-    const html = renderToStaticMarkup(<WeeklyActivity activities={[{ playerId: 'child', localDate: date, firstSessionId: 'session' }]} />);
+    const html = renderToStaticMarkup(<WeeklyActivity activities={[{ playerId: 'child', localDate: date, completedSessions: 5, activeLearningMs: 0 }]} />);
     for (const label of ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']) expect(html).toContain(label);
     expect(html).toContain('noch nicht aktiv');
     expect(html).toContain('aria-current="date"');

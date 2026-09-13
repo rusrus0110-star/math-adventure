@@ -1,11 +1,8 @@
 export const MAX_STARS = 7;
 
-export function calculateStars(accuracy: number): number {
-  if (!Number.isFinite(accuracy)) return 0;
-  const correctAnswers = Math.min(10, Math.max(0, Math.round(accuracy * 10)));
-  if (correctAnswers < 3) return 0;
-  if (correctAnswers < 5) return 1;
-  return correctAnswers - 3;
+export function calculateMasteryGain(previousStars: number, correctAnswers: number, questionCount = 10): number {
+  return previousStars < MAX_STARS && questionCount === 10 && Number.isInteger(correctAnswers) &&
+    correctAnswers >= 8 && correctAnswers <= questionCount ? 1 : 0;
 }
 
 export function calculateCoins(correctAnswers: number, questionCount: number): number {

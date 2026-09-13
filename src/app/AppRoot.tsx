@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { usePlayerStore } from '@/features/player/playerStore';
 import { AppShell } from '@/shared/components/AppShell';
 import { t } from '@/shared/i18n';
+import { LearningTracker } from '@/features/learning/LearningTracker';
 
 export function AppRoot() {
   const initialize = usePlayerStore((state) => state.initialize);
@@ -26,5 +27,5 @@ export function AppRoot() {
     );
   }
 
-  return <Outlet />;
+  return <><LearningTracker /><Outlet /></>;
 }
