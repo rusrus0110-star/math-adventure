@@ -9,7 +9,7 @@ export function QuestionCard({ question }: QuestionCardProps) {
   return (
     <div className={styles.card}>
       <span>{question.leftOperand}</span>
-      <span>+</span>
+      <span>{question.operation === 'addition' ? '+' : '−'}</span>
       <span>{question.rightOperand}</span>
       <span>=</span>
       <span>?</span>

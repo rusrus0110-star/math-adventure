@@ -1,6 +1,5 @@
 .page { display: grid; gap: 20px; }
 .page h1 { text-align: center; }
-.back { justify-self: start; border: 0; background: transparent; font: inherit; cursor: pointer; }
 .list { display: grid; gap: 14px; }
 .card { min-height: 112px; display: grid; align-content: center; gap: 8px; text-align: left; border: 0; border-radius: 22px; padding: 18px 20px; background: var(--surface); box-shadow: var(--shadow-soft); font: inherit; cursor: pointer; }
 .card strong { font-size: 1.25rem; }

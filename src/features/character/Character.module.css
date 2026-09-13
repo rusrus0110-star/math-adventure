@@ -1,4 +1,5 @@
 .character {
+  position: relative;
   display: grid;
   place-items: center;
   justify-self: center;
@@ -15,6 +16,21 @@
   height: 100%;
   object-fit: contain;
   -webkit-user-drag: none;
+}
+
+.accessory {
+  position: absolute;
+  top: 4%;
+  right: 4%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 31%;
+  aspect-ratio: 1;
+  font-size: clamp(2rem, 8vw, 4rem);
+  line-height: 1;
+  transform: rotate(9deg);
+  filter: drop-shadow(0 5px 5px rgb(63 47 33 / 0.25));
 }
 
 .small {

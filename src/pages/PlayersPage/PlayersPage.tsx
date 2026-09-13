@@ -11,11 +11,14 @@ export function PlayersPage() {
   const players = usePlayerStore((state) => state.players);
   const createPlayer = usePlayerStore((state) => state.createPlayer);
   const selectPlayer = usePlayerStore((state) => state.selectPlayer);
+  const [busy, setBusy] = useState(false);
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const handleCreate = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (busy) return;
+    setBusy(true);
     setError(null);
 
     try {
@@ -23,12 +26,14 @@ export function PlayersPage() {
       navigate('/home');
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : 'Fehler');
-    }
+    } finally { setBusy(false); }
   };
 
   const handleSelect = async (playerId: string) => {
-    await selectPlayer(playerId);
-    navigate('/home');
+    setBusy(true); setError(null);
+    try { await selectPlayer(playerId); navigate('/home'); }
+    catch (caught) { setError(caught instanceof Error ? caught.message : 'Profil konnte nicht geladen werden.'); }
+    finally { setBusy(false); }
   };
 
   return (
@@ -41,6 +46,7 @@ export function PlayersPage() {
             {players.map((player) => (
               <button
                 key={player.id}
+                disabled={busy}
                 className={styles.playerCard}
                 onClick={() => void handleSelect(player.id)}
               >
@@ -62,7 +68,7 @@ export function PlayersPage() {
             onChange={(event) => setName(event.target.value)}
           />
           {error && <p className={styles.error}>{error}</p>}
-          <PrimaryButton type="submit" disabled={name.trim().length === 0}>
+          <PrimaryButton type="submit" disabled={busy || name.trim().length === 0}>
             {t('players.create')}
           </PrimaryButton>
         </form>

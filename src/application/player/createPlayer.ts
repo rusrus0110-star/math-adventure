@@ -1,11 +1,9 @@
 import type { PlayerRepository } from '@/application/ports/PlayerRepository';
-import type { ProgressRepository } from '@/application/ports/ProgressRepository';
 import type { PlayerProfile } from '@/domain/player/player.types';
 import { createInitialProgress } from '@/domain/progression/progression.service';
 
 export interface CreatePlayerDependencies {
   playerRepository: PlayerRepository;
-  progressRepository: ProgressRepository;
 }
 
 export async function createPlayer(
@@ -22,13 +20,12 @@ export async function createPlayer(
   const player: PlayerProfile = {
     id: crypto.randomUUID(),
     name: normalizedName,
-    characterId: 'placeholder-cat',
+    characterId: 'mia-cat',
     createdAt: now,
     updatedAt: now,
   };
 
-  await dependencies.playerRepository.save(player);
-  await dependencies.progressRepository.save(createInitialProgress(player.id));
+  await dependencies.playerRepository.createWithProgress(player, createInitialProgress(player.id));
 
   return player;
 }

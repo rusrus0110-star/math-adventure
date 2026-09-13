@@ -1,4 +1,6 @@
-export type Operation = 'addition';
+import type { MasterySnapshot } from './services/masteryFeedback';
+
+export type Operation = 'addition' | 'subtraction';
 export type CarryMode = 'any' | 'no-carry' | 'carry' | 'tens-only';
 
 export interface Question {
@@ -11,6 +13,7 @@ export interface Question {
 }
 
 export interface QuestionAttempt {
+  operation: Operation;
   id: string;
   playerId: string;
   sessionId: string;
@@ -25,6 +28,11 @@ export interface QuestionAttempt {
 }
 
 export interface GameSessionRecord {
+  questionSetVersion?: string;
+  mastery?: MasterySnapshot;
+  stars: number;
+  activityCoins: number;
+  localDate: string;
   id: string;
   playerId: string;
   levelId: string;

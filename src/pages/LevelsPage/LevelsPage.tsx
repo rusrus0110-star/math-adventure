@@ -1,12 +1,15 @@
 import { Navigate, useNavigate } from 'react-router-dom';
+import { MAX_STARS } from '@/domain/game/services/calculateRewards';
 import { LEVELS } from '@/domain/progression/levels';
 import { usePlayerStore } from '@/features/player/playerStore';
 import { AppShell } from '@/shared/components/AppShell';
+import { BackButton } from '@/shared/components/BackButton';
 import { t } from '@/shared/i18n';
 import styles from './LevelsPage.module.css';
 
 function renderStars(count: number): string {
-  return `${'⭐'.repeat(count)}${'☆'.repeat(3 - count)}`;
+  const safeCount = Math.max(0, Math.min(MAX_STARS, count));
+  return `${'★'.repeat(safeCount)}${'☆'.repeat(MAX_STARS - safeCount)}`;
 }
 
 export function LevelsPage() {
@@ -19,8 +22,9 @@ export function LevelsPage() {
   return (
     <AppShell>
       <section className={styles.page}>
-        <button className={styles.back} onClick={() => navigate('/home')}>← {t('common.back')}</button>
+        <BackButton onClick={() => navigate('/home')} />
         <h1>{t('levels.title')}</h1>
+        <p>10 Aufgaben: 5 Plus und 5 Minus. Mit 8 richtigen Antworten (5/7 Sterne) öffnet sich das nächste Level.</p>
         <div className={styles.list}>
           {LEVELS.map((level) => {
             const unlocked = progress?.unlockedLevelIds.includes(level.id) ?? level.order === 1;
@@ -35,7 +39,8 @@ export function LevelsPage() {
               >
                 <span className={styles.number}>Level {level.order}</span>
                 <strong>{t(level.titleKey)}</strong>
-                <span>{unlocked ? renderStars(stars) : `🔒 ${t('levels.locked')}`}</span>
+                <span aria-label={`${stars} von ${MAX_STARS} Sternen`}>{renderStars(stars)}</span>
+                {!unlocked && <span>🔒 {t('levels.locked')}</span>}
               </button>
             );
           })}

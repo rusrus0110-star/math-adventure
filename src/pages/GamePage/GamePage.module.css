@@ -1,15 +1,14 @@
 .page {
   width: min(calc(100vw - 36px), 1060px);
-  height: calc(
+  min-height: calc(
     100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
   );
-  min-height: 0;
   margin-left: 50%;
   transform: translateX(-50%);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: clamp(8px, 1.5vh, 14px);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .header {
@@ -38,8 +37,22 @@
 .status {
   display: flex;
   align-items: center;
-  gap: clamp(14px, 3vw, 28px);
+  gap: clamp(10px, 2.2vw, 22px);
   font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+}
+
+.coinStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border: 1px solid #f0cf78;
+  border-radius: 999px;
+  background: #fff4bd;
+}
+
+.coinStatus strong {
+  font-size: 1.1em;
 }
 
 .gameArea {
@@ -150,7 +163,22 @@
 }
 
 .correctFeedback {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   font-size: clamp(1.1rem, 2.6vh, 1.3rem);
+}
+
+.coinBurst {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #fff2ad;
+  color: #6d5711;
+  font-size: 0.88em;
+  animation: coinFly 760ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
 .wrongFeedback {
@@ -179,6 +207,23 @@
   border-radius: inherit;
   background: var(--accent);
   transition: width 180ms ease;
+}
+
+@keyframes coinFly {
+  0% {
+    opacity: 0;
+    transform: translateY(9px) scale(0.75) rotate(-8deg);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.12) rotate(4deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1) rotate(0deg);
+  }
 }
 
 @keyframes feedbackPop {
@@ -284,7 +329,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .feedbackVisible {
+  .feedbackVisible,
+  .coinBurst {
     animation: none;
   }
 

@@ -4,7 +4,7 @@ export const LEVELS: readonly GameLevel[] = [
   {
     id: 'addition-5',
     order: 1,
-    titleKey: 'levels.addition5',
+    titleKey: 'levels.mixed5',
     operation: 'addition',
     minOperand: 0,
     maxOperand: 5,
@@ -17,7 +17,7 @@ export const LEVELS: readonly GameLevel[] = [
   {
     id: 'addition-10',
     order: 2,
-    titleKey: 'levels.addition10',
+    titleKey: 'levels.mixed10',
     operation: 'addition',
     minOperand: 0,
     maxOperand: 10,
@@ -30,7 +30,7 @@ export const LEVELS: readonly GameLevel[] = [
   {
     id: 'addition-20',
     order: 3,
-    titleKey: 'levels.addition20',
+    titleKey: 'levels.mixed20',
     operation: 'addition',
     minOperand: 2,
     maxOperand: 12,
@@ -56,7 +56,7 @@ export const LEVELS: readonly GameLevel[] = [
   {
     id: 'addition-100',
     order: 5,
-    titleKey: 'levels.addition100',
+    titleKey: 'levels.mixed100',
     operation: 'addition',
     minOperand: 10,
     maxOperand: 89,

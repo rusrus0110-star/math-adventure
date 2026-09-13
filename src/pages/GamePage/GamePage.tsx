@@ -1,9 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { getVirtualRewardById } from '@/domain/motivation/virtualRewards';
 import { getLevelById } from '@/domain/progression/levels';
 import { Character } from '@/features/character/Character';
 import { QuestionCard } from '@/features/game/QuestionCard';
 import { useGameStore } from '@/features/game/gameStore';
+import { useMotivationStore } from '@/features/motivation/motivationStore';
 import { usePlayerStore } from '@/features/player/playerStore';
 import { AppShell } from '@/shared/components/AppShell';
 import { t } from '@/shared/i18n';
@@ -15,6 +17,10 @@ export function GamePage() {
   const activePlayer = usePlayerStore((state) => state.activePlayer);
   const progress = usePlayerStore((state) => state.progress);
   const refreshProgress = usePlayerStore((state) => state.refreshProgress);
+  const motivationPlayerId = useMotivationStore((state) => state.playerId);
+  const motivation = useMotivationStore((state) => state.settings);
+  const loadMotivation = useMotivationStore((state) => state.loadForPlayer);
+  const refreshMotivation = useMotivationStore((state) => state.refresh);
   const start = useGameStore((state) => state.start);
   const answer = useGameStore((state) => state.answer);
   const gameLevel = useGameStore((state) => state.level);
@@ -22,13 +28,17 @@ export function GamePage() {
   const questionIndex = useGameStore((state) => state.questionIndex);
   const score = useGameStore((state) => state.score);
   const streak = useGameStore((state) => state.currentStreak);
+  const correctAnswers = useGameStore((state) => state.correctAnswers);
   const feedback = useGameStore((state) => state.feedback);
   const lastCorrectAnswer = useGameStore((state) => state.lastCorrectAnswer);
   const lastSelectedAnswer = useGameStore((state) => state.lastSelectedAnswer);
   const lastScore = useGameStore((state) => state.lastScore);
   const result = useGameStore((state) => state.result);
   const gameError = useGameStore((state) => state.error);
-  const startedRef = useRef<string | null>(null);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const retrySave = useGameStore((state) => state.retrySave);
+  const isFinishing = useGameStore((state) => state.isFinishing);
+  const attempts = useGameStore((state) => state.attempts);
 
   const level = levelId ? getLevelById(levelId) : undefined;
   const unlocked = level
@@ -36,20 +46,28 @@ export function GamePage() {
     : false;
 
   useEffect(() => {
+    if (activePlayer) void loadMotivation(activePlayer.id);
+  }, [activePlayer, loadMotivation]);
+
+  useEffect(() => {
     if (!activePlayer || !level || !unlocked) return;
 
-    const key = `${activePlayer.id}:${level.id}`;
-    if (startedRef.current === key) return;
-
-    startedRef.current = key;
     start(activePlayer.id, level);
+    return () => {
+      if (!useGameStore.getState().result) useGameStore.getState().reset();
+    };
   }, [activePlayer, level, start, unlocked]);
 
   useEffect(() => {
-    if (!result) return;
-
-    void refreshProgress().then(() => navigate('/results'));
-  }, [navigate, refreshProgress, result]);
+    if (!result || !activePlayer || result.playerId !== activePlayer.id || useGameStore.getState().result !== result) return;
+    let cancelled = false;
+    void Promise.all([refreshProgress(), refreshMotivation(activePlayer.id)])
+      .then(() => { if (!cancelled) navigate('/results', { replace: true }); })
+      .catch((error: unknown) => {
+        if (!cancelled) setRefreshError(error instanceof Error ? error.message : 'Fortschritt konnte nicht geladen werden.');
+      });
+    return () => { cancelled = true; };
+  }, [activePlayer, navigate, refreshMotivation, refreshProgress, result]);
 
   if (!activePlayer) return <Navigate to="/players" replace />;
   if (!level || !unlocked) return <Navigate to="/levels" replace />;
@@ -73,7 +91,10 @@ export function GamePage() {
     return styles.inactiveAnswer;
   };
 
-  const progressPercent = (questionIndex / gameLevel.questionCount) * 100;
+  const progressPercent = (attempts.length / gameLevel.questionCount) * 100;
+  const liveCoins = (progress?.coins ?? 0) + correctAnswers;
+  const activeMotivation = motivationPlayerId === activePlayer.id ? motivation : null;
+  const equippedReward = getVirtualRewardById(activeMotivation?.equippedVirtualRewardId);
 
   return (
     <AppShell>
@@ -88,7 +109,8 @@ export function GamePage() {
           </button>
 
           <div className={styles.status}>
-            <span>⭐ {score}</span>
+            <span>✨ {score} Pkt.</span>
+            <span className={styles.coinStatus}>🪙 <strong>{liveCoins}</strong></span>
             <span>
               {questionIndex + 1} / {gameLevel.questionCount}
             </span>
@@ -98,6 +120,7 @@ export function GamePage() {
         <main className={styles.gameArea}>
           <div className={styles.characterArea}>
             <Character
+              accessoryIcon={equippedReward?.icon}
               mood={
                 feedback === 'correct'
                   ? 'happy'
@@ -134,19 +157,21 @@ export function GamePage() {
               aria-live="assertive"
               aria-atomic="true"
             >
-              {gameError && <strong>{gameError}</strong>}
+              {gameError && <div role="alert"><strong>{gameError}</strong><button disabled={isFinishing} onClick={() => void retrySave()}>Erneut speichern</button></div>}
+              {refreshError && <div role="alert">{refreshError}<button onClick={() => navigate('/results')}>Zum Ergebnis</button></div>}
 
               {feedback === 'correct' && (
-                <strong className={styles.correctFeedback}>
-                  {t('game.correct')} +{lastScore?.total ?? 0} ⭐
-                </strong>
+                <div className={styles.correctFeedback}>
+                  <strong>{t('game.correct')} +{lastScore?.total ?? 0} Pkt.</strong>
+                  <span key={correctAnswers} className={styles.coinBurst}>+1 🪙</span>
+                </div>
               )}
 
               {feedback === 'wrong' && (
                 <strong className={styles.wrongFeedback}>
                   <span>{t('game.almost')}</span>
                   <span className={styles.correctEquation}>
-                    {question.leftOperand} + {question.rightOperand} = {lastCorrectAnswer}
+                    {question.leftOperand} {question.operation === 'addition' ? '+' : '−'} {question.rightOperand} = {lastCorrectAnswer}
                   </span>
                 </strong>
               )}

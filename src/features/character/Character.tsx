@@ -6,12 +6,14 @@ interface CharacterProps {
   mood?: CharacterMood;
   size?: 'small' | 'large';
   className?: string;
+  accessoryIcon?: string | null | undefined;
 }
 
 export function Character({
   mood = 'idle',
   size = 'large',
   className = '',
+  accessoryIcon = null,
 }: CharacterProps) {
   const imageSrc = defaultCharacter.assets[mood];
 
@@ -25,6 +27,11 @@ export function Character({
         alt={defaultCharacter.name}
         draggable={false}
       />
+      {accessoryIcon && (
+        <span className={styles.accessory} aria-hidden="true">
+          {accessoryIcon}
+        </span>
+      )}
     </div>
   );
 }

@@ -1,12 +1,5 @@
 # Character assets
 
-The v0.1 UI uses an emoji placeholder. Replace it later with the child's original character artwork.
+Mia uses four transparent PNG states: idle, thinking, celebrate (happy), and almost. Character configuration lives in src/features/character/characters.ts.
 
-Recommended asset states per character:
-
-- `idle`
-- `happy`
-- `thinking`
-- `celebrate`
-
-Prefer transparent PNG/WebP files with consistent canvas dimensions.
+Keep replacement artwork on consistent canvases. Accessories are configuration-driven overlays. Vite's PWA configuration precaches these images for offline use.

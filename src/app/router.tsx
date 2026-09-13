@@ -1,3 +1,4 @@
+import { ParentPage } from '@/pages/ParentPage/ParentPage';
 import { createBrowserRouter } from 'react-router-dom';
 import { AppRoot } from '@/app/AppRoot';
 import { BootstrapPage } from '@/pages/BootstrapPage';
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       { path: 'game/:levelId', element: <GamePage /> },
       { path: 'results', element: <ResultsPage /> },
       { path: 'progress', element: <ProgressPage /> },
+      { path: 'parents', element: <ParentPage /> },
       { path: 'rewards', element: <RewardsPage /> },
     ],
   },

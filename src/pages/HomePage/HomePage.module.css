@@ -1,8 +1,302 @@
-.page { display: grid; gap: 24px; }
-.stats { display: flex; justify-content: space-between; gap: 12px; font-size: 1.1rem; font-weight: 800; }
-.hero { display: grid; justify-items: center; text-align: center; gap: 4px; padding-top: 12px; }
-.hero p, .hero h1, .hero h2 { margin: 0; }
-.hero h1 { font-size: clamp(2.2rem, 9vw, 3.6rem); }
-.hero h2 { margin-top: 8px; font-size: 1.3rem; color: var(--text-muted); }
-.actions { display: grid; gap: 12px; }
-.link { border: 0; background: transparent; padding: 12px; font: inherit; color: var(--text-muted); cursor: pointer; }
+.page {
+  width: min(100%, 1000px);
+  min-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  margin: 0 auto;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: clamp(12px, 2vh, 20px);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scoreChip,
+.coinChip {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.86);
+  box-shadow: 0 5px 16px rgb(84 66 96 / 0.07);
+  font: inherit;
+  font-weight: 800;
+}
+
+.coinChip {
+  border-color: #f2cf74;
+  background: #fff5c8;
+  cursor: pointer;
+}
+
+.coinChip > span:first-child {
+  font-size: 1.35rem;
+}
+
+.coinChip strong {
+  font-size: 1.25rem;
+}
+
+.coinChip > span:last-child {
+  color: #6d5b25;
+  font-size: 0.8rem;
+}
+
+.mainGrid {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(360px, 1.2fr);
+  align-items: center;
+  gap: clamp(24px, 5vw, 70px);
+}
+
+.heroPanel {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.heroPanel > div:first-child {
+  width: clamp(175px, 31vh, 255px);
+}
+
+.welcome p,
+.welcome h1 {
+  margin: 0;
+}
+
+.welcome p {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.welcome h1 {
+  font-size: clamp(2rem, 5vh, 3rem);
+  line-height: 1;
+}
+
+.heroPanel > button {
+  width: min(100%, 280px);
+}
+
+.goalsPanel {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.goalCard {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+  padding: clamp(16px, 2.6vh, 22px);
+  border: 1px solid #efdca4;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fffdf6, #fff5cf);
+  box-shadow: var(--shadow-soft);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.weeklyCard {
+  border-color: #decdf1;
+  background: linear-gradient(145deg, #fff, #f4eaff);
+}
+
+.goalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.goalHeader span {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.goalHeader strong {
+  font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+  text-align: right;
+}
+
+.goalNumbers {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.goalNumbers strong {
+  font-size: clamp(1.05rem, 2.5vw, 1.28rem);
+}
+
+.goalNumbers span,
+.goalHint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.progressTrack {
+  height: 13px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.88);
+  box-shadow: inset 0 0 0 1px rgb(84 66 96 / 0.08);
+}
+
+.coinProgress,
+.weekProgress {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 420ms ease;
+}
+
+.coinProgress {
+  background: linear-gradient(90deg, #ffd34e, #ffae38);
+}
+
+.weekProgress {
+  background: linear-gradient(90deg, #b99ae8, #8068cf);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+}
+
+.actions button {
+  min-height: 38px;
+  padding: 7px 11px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actions button:hover {
+  background: rgb(255 255 255 / 0.65);
+  color: var(--text);
+}
+
+@media (max-width: 700px) {
+  .page {
+    min-height: auto;
+    gap: 12px;
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .heroPanel {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'character welcome'
+      'play play';
+    align-items: center;
+    text-align: left;
+  }
+
+  .heroPanel > div:first-child {
+    grid-area: character;
+    width: clamp(95px, 25vw, 125px);
+  }
+
+  .welcome {
+    grid-area: welcome;
+  }
+
+  .welcome h1 {
+    font-size: clamp(1.8rem, 9vw, 2.45rem);
+  }
+
+  .heroPanel > button {
+    grid-area: play;
+    width: 100%;
+  }
+
+  .goalsPanel {
+    gap: 9px;
+  }
+
+  .goalCard {
+    gap: 8px;
+    padding: 13px 14px;
+    border-radius: 18px;
+  }
+
+  .goalHeader {
+    align-items: center;
+  }
+
+  .goalHeader strong {
+    font-size: 1rem;
+  }
+
+  .goalNumbers {
+    gap: 8px;
+  }
+
+  .goalNumbers span {
+    font-size: 0.78rem;
+    text-align: right;
+  }
+
+  .progressTrack {
+    height: 10px;
+  }
+
+  .actions {
+    gap: 3px;
+  }
+
+  .actions button {
+    font-size: 0.78rem;
+    padding-inline: 7px;
+  }
+}
+
+@media (min-width: 701px) and (max-height: 620px) {
+  .page {
+    gap: 9px;
+  }
+
+  .heroPanel > div:first-child {
+    width: clamp(145px, 28vh, 190px);
+  }
+
+  .goalCard {
+    gap: 7px;
+    padding: 12px 15px;
+    border-radius: 18px;
+  }
+
+  .mainGrid {
+    gap: 28px;
+  }
+}
